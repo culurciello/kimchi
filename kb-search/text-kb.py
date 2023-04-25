@@ -236,7 +236,7 @@ def save_network_html(kb, filename="network.html"):
 tokenizer = AutoTokenizer.from_pretrained("Babelscape/rebel-large")
 model = AutoModelForSeq2SeqLM.from_pretrained("Babelscape/rebel-large")
 
-with open("cthulhu-full.txt") as file:
+with open("cthulhu-short.txt") as file:
     text = file.read()
 
 kb = from_text_to_kb(text, verbose=True)
