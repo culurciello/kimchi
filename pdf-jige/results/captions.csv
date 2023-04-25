@@ -1,7 +1,0 @@
-image,caption,id
-results/NIPS-2017-attention-is-all-you-need-Paper.pdf/figure_1.png,"The Transformer follows this overall architecture using stacked self-attention and point-wise, fully connected layers for both the encoder and decoder, shown in the left and right halves of Figure 1, respectively.",0
-results/NIPS-2017-attention-is-all-you-need-Paper.pdf/figure_1.png,"The ﬁrst is a multi-head self-attention mechanism, and the second is a simple, position- 2 Figure 1: The Transformer - model architecture.",1
-results/NIPS-2017-attention-is-all-you-need-Paper.pdf/figure_2.png,"3.2.1 Scaled Dot-Product Attention We call our particular attention ""Scaled Dot-Product Attention"" (Figure 2).",0
-results/NIPS-2017-attention-is-all-you-need-Paper.pdf/figure_2.png,We compute the dot products of the 3 Scaled Dot-Product Attention Multi-Head Attention Figure 2: (left) Scaled Dot-Product Attention.,1
-results/NIPS-2017-attention-is-all-you-need-Paper.pdf/figure_2.png,"These are concatenated and once again projected, resulting in the ﬁnal values, as depicted in Figure 2.",2
-results/NIPS-2017-attention-is-all-you-need-Paper.pdf/figure_2.png,See Figure 2.,3

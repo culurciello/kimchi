@@ -1,4 +1,4 @@
-# E. Culurciello, A. Chang
+# E. Culurciello
 # March 2023
 # ABRAIN web version neural network
 
