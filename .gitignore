@@ -26,3 +26,9 @@ reader/train/.DS_Store
 pdf-jige/.DS_Store
 .DS_Store
 pdf-jige/.DS_Store
+kb-search/lib/vis-9.1.2/vis-network.min.js
+kb-search/lib/vis-9.1.2/vis-network.css
+kb-search/lib/tom-select/tom-select.css
+kb-search/lib/tom-select/tom-select.complete.min.js
+kb-search/lib/bindings/utils.js
+kb-search/cthulhu-kb.html
