@@ -7,11 +7,7 @@ from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
 import math
 import torch
 # import wikipedia
-# from newspaper import Article, ArticleException
-# from GoogleNews import GoogleNews
-import IPython
 from pyvis.network import Network
-
 
 
 class KB():
@@ -236,15 +232,14 @@ def save_network_html(kb, filename="network.html"):
 tokenizer = AutoTokenizer.from_pretrained("Babelscape/rebel-large")
 model = AutoModelForSeq2SeqLM.from_pretrained("Babelscape/rebel-large")
 
-with open("cthulhu-short.txt") as file:
+text_filename = "cthulhu-full.txt"
+with open(text_filename) as file:
     text = file.read()
 
 kb = from_text_to_kb(text, verbose=True)
 # kb = load_kb("cthulhu-kb.p")
-kb.print()
+# kb.print()
 
-filename = "cthulhu-kb.html"
-# save_kb(kb, filename.split(".")[0] + ".p")
-save_network_html(kb, filename=filename)
-IPython.display.HTML(filename=filename)
-
+html_filename = "cthulhu-kb.html"
+save_kb(kb, filename.split(".")[0] + ".p")
+save_network_html(kb, filename=html_filename)
