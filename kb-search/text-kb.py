@@ -9,7 +9,9 @@ import torch
 # import wikipedia
 from pyvis.network import Network
 from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
-from transformers import AutoModelForTokenClassification, pipeline # filterNER
+
+# filterNER https://huggingface.co/dslim/bert-base-NER
+from transformers import AutoModelForTokenClassification, pipeline 
 
 title = '>>> Generate knowledge base from text <<<'
 
@@ -17,7 +19,7 @@ def get_args():
     parser = argparse.ArgumentParser(description=title)
     arg = parser.add_argument
     arg('--text_filename', type=str, default="cthulhu-full.txt",  help='text file to search')
-    arg('--html_filename', type=str, default="cthulhu-kb.html",  help='html file output')
+    arg('--filter', action='store_true',  help='filter for named entities')
     args = parser.parse_args()
     return args
 
@@ -57,16 +59,24 @@ class KB():
         r2["meta"]["spans"] += spans_to_add
 
     def filterNER(self, candidate_entity):
-        ner_results = self.filter_nlp(candidate_entity)
-        if len(ner_results) > 0:
-            entity_data = {
-                "title": candidate_entity,
-                "url": candidate_entity,
-                "summary": candidate_entity
-            }
-            return entity_data
+        if args.filter:
+            ner_results = self.filter_nlp(candidate_entity)
+            if len(ner_results) > 0:
+                entity_data = {
+                    "title": candidate_entity,
+                    "url": candidate_entity,
+                    "summary": candidate_entity
+                }
+                return entity_data
+            else:
+                return None
         else:
-            return None
+            entity_data = {
+                    "title": candidate_entity,
+                    "url": candidate_entity,
+                    "summary": candidate_entity
+                }
+            return entity_data
 
     def add_entity(self, e):
         self.entities[e["title"]] = {k:v for k,v in e.items() if k != "title"}
@@ -253,6 +263,8 @@ def save_network_html(kb, filename="network.html"):
 if __name__ == "__main__":
     print(bcolors.HEADER + title + bcolors.ENDC)
     args = get_args() # all input arguments
+    if args.filter:
+        print(bcolors.OKGREEN + "Filtering name entity ON!"+ bcolors.ENDC)
 
     # Load model and tokenizer
     print(bcolors.OKGREEN + "loading models..."+ bcolors.ENDC)
@@ -266,5 +278,10 @@ if __name__ == "__main__":
     kb = from_text_to_kb(text, verbose=True)
     # kb = load_kb("cthulhu-kb.p")
     # kb.print()
-    save_kb(kb, args.html_filename.split(".")[0] + ".p")
-    save_network_html(kb, filename=args.html_filename)
+    if args.filter:
+        ft = "-filtered"
+    else:
+        ft=""
+    basename = args.text_filename.split(".")[0]
+    save_kb(kb, basename+ft+".p")
+    save_network_html(kb, filename=basename+ft+".html")
