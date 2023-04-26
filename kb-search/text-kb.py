@@ -2,12 +2,35 @@
 # April 2023
 # knowledge base from text
 
-import pickle
-from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
 import math
+import pickle
+import argparse
 import torch
 # import wikipedia
 from pyvis.network import Network
+from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
+
+title = '>>> Generate knowledge base from text <<<'
+
+def get_args():
+    parser = argparse.ArgumentParser(description=title)
+    arg = parser.add_argument
+    arg('--text_filename', type=str, default="cthulhu-full.txt",  help='text file to search')
+    arg('--html_filename', type=str, default="cthulhu-kb.html",  help='html file output')
+    args = parser.parse_args()
+    return args
+
+
+class bcolors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKCYAN = '\033[96m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
 
 
 class KB():
@@ -73,12 +96,12 @@ class KB():
             self.merge_relations(r)
 
     def print(self):
-        print("Entities:")
+        print(bcolors.OKBLUE+ "Entities:"+ bcolors.ENDC)
         for e in self.entities.items():
-            print(f"  {e}")
-        print("Relations:")
+            print(bcolors.OKBLUE+f"  {e}")
+        print("Relations:"+ bcolors.ENDC)
         for r in self.relations:
-            print(f"  {r}")
+            print(bcolors.OKBLUE+f"  {r}"+ bcolors.ENDC)
 
 
 def extract_relations_from_model_output(text):
@@ -133,10 +156,10 @@ def from_text_to_kb(text, span_length=128, verbose=False):
     # compute span boundaries
     num_tokens = len(inputs["input_ids"][0])
     if verbose:
-        print(f"Input has {num_tokens} tokens")
+        print(bcolors.OKGREEN + f"Input has {num_tokens} tokens"+ bcolors.ENDC)
     num_spans = math.ceil(num_tokens / span_length)
     if verbose:
-        print(f"Input has {num_spans} spans")
+        print(bcolors.OKGREEN  + f"Input has {num_spans} spans"+ bcolors.ENDC)
     overlap = math.ceil((num_spans * span_length - num_tokens) / 
                         max(num_spans - 1, 1))
     spans_boundaries = []
@@ -146,7 +169,7 @@ def from_text_to_kb(text, span_length=128, verbose=False):
                                  start + span_length * (i + 1)])
         start -= overlap
     if verbose:
-        print(f"Span boundaries are {spans_boundaries}")
+        print(bcolors.OKGREEN  + f"Span boundaries are {spans_boundaries}"+ bcolors.ENDC)
 
     # transform input with spans
     tensor_ids = [inputs["input_ids"][0][boundary[0]:boundary[1]]
@@ -204,7 +227,7 @@ def load_kb(filename):
 def save_network_html(kb, filename="network.html"):
     # create network
     net = Network(directed=True, width="1024px", height="1024px", bgcolor="#eeeeee")
-    print(net)
+    # print(net)
 
     # nodes
     color_entity = "#00FF00"
@@ -228,18 +251,21 @@ def save_network_html(kb, filename="network.html"):
     net.show(filename, notebook=False)
 
 
-# Load model and tokenizer
-tokenizer = AutoTokenizer.from_pretrained("Babelscape/rebel-large")
-model = AutoModelForSeq2SeqLM.from_pretrained("Babelscape/rebel-large")
+if __name__ == "__main__":
+    print(bcolors.HEADER + title + bcolors.ENDC)
+    args = get_args() # all input arguments
 
-text_filename = "cthulhu-full.txt"
-with open(text_filename) as file:
-    text = file.read()
+    # Load model and tokenizer
+    print(bcolors.OKGREEN + "loading models..."+ bcolors.ENDC)
+    tokenizer = AutoTokenizer.from_pretrained("Babelscape/rebel-large")
+    model = AutoModelForSeq2SeqLM.from_pretrained("Babelscape/rebel-large")
 
-kb = from_text_to_kb(text, verbose=True)
-# kb = load_kb("cthulhu-kb.p")
-# kb.print()
+    print(bcolors.OKCYAN + "Processing file:", args.text_filename + bcolors.ENDC)
+    with open(args.text_filename) as file:
+        text = file.read()
 
-html_filename = "cthulhu-kb.html"
-save_kb(kb, filename.split(".")[0] + ".p")
-save_network_html(kb, filename=html_filename)
+    kb = from_text_to_kb(text, verbose=True)
+    # kb = load_kb("cthulhu-kb.p")
+    # kb.print()
+    save_kb(kb, args.html_filename.split(".")[0] + ".p")
+    save_network_html(kb, filename=args.html_filename)
