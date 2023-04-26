@@ -9,6 +9,7 @@ import torch
 # import wikipedia
 from pyvis.network import Network
 from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
+from transformers import AutoModelForTokenClassification, pipeline # filterNER
 
 title = '>>> Generate knowledge base from text <<<'
 
@@ -37,6 +38,10 @@ class KB():
     def __init__(self):
         self.entities = {}
         self.relations = []
+        # filterNER:
+        self.filter_tokenizer = AutoTokenizer.from_pretrained("dslim/bert-large-NER")
+        self.filter_model = AutoModelForTokenClassification.from_pretrained("dslim/bert-large-NER")
+        self.filter_nlp = pipeline("ner", model=self.filter_model, tokenizer=self.filter_tokenizer)
 
     def are_relations_equal(self, r1, r2):
         return all(r1[attr] == r2[attr] for attr in ["head", "type", "tail"])
@@ -51,31 +56,25 @@ class KB():
                         if span not in r2["meta"]["spans"]]
         r2["meta"]["spans"] += spans_to_add
 
-    def get_wikipedia_data(self, candidate_entity):
-        try:
-            # page = wikipedia.page(candidate_entity, auto_suggest=False)
-            # entity_data = {
-            #     "title": page.title,
-            #     "url": page.url,
-            #     "summary": page.summary
-            # }
+    def filterNER(self, candidate_entity):
+        ner_results = self.filter_nlp(candidate_entity)
+        if len(ner_results) > 0:
             entity_data = {
                 "title": candidate_entity,
                 "url": candidate_entity,
                 "summary": candidate_entity
             }
             return entity_data
-        except:
+        else:
             return None
 
     def add_entity(self, e):
         self.entities[e["title"]] = {k:v for k,v in e.items() if k != "title"}
 
     def add_relation(self, r):
-        # check on wikipedia
+        # filter with Name Entity Recognition
         candidate_entities = [r["head"], r["tail"]]
-        entities = [self.get_wikipedia_data(ent) for ent in candidate_entities]
-        # entities = [ent for ent in candidate_entities]
+        entities = [self.filterNER(ent) for ent in candidate_entities]
 
         # if one entity does not exist, stop
         if any(ent is None for ent in entities):
