@@ -18,8 +18,9 @@ def get_args():
     arg = parser.add_argument
     arg('--pdfs_path', type=str, default="test_pdfs/",  help='path for input PDF files')
     arg('--results_path', type=str, default="results/",  help='results path')
-    arg('--enable_tables', type=bool, default=False,  help='find tables?')
-    arg('--save', type=bool, default=True,  help='save')
+    arg('--enable_tables', action='store_true',  help='find tables?')
+    arg('--enable_images', action='store_true',  help='find images?')
+    arg('--save', action='store_false',  help='save')
     args = parser.parse_args()
     return args
 
@@ -80,28 +81,28 @@ def extract_from_pdf(args):
                             if args.save:
                                 tables[0].to_csv(savepath)
 
-
                 # 3- find images
-                image_list = page.get_images()
-                # printing number of images found in this page
-                if image_list:
-                    print('\tImages #:', len(image_list))
-                    for image_index, img in enumerate(image_list, start=1):
-                        # get the XREF of the image
-                        xref = img[0]
-                        # extract the image bytes
-                        base_image = pdf_file.extract_image(xref)
-                        image_bytes = base_image["image"]
-                        # get the image extension
-                        image_ext = base_image["ext"]
+                if args.enable_images:
+                    image_list = page.get_images()
+                    # printing number of images found in this page
+                    if image_list:
+                        print('\tImages #:', len(image_list))
+                        for image_index, img in enumerate(image_list, start=1):
+                            # get the XREF of the image
+                            xref = img[0]
+                            # extract the image bytes
+                            base_image = pdf_file.extract_image(xref)
+                            image_bytes = base_image["image"]
+                            # get the image extension
+                            image_ext = base_image["ext"]
 
-                        # save image:
-                        savepath = file_results_path+f"images/figure_{len(figures_list)+1}.{image_ext}"
-                        figures_list.append(savepath)
-                        if args.save:
-                            image = Image.open(io.BytesIO(image_bytes)) # load it to PIL
-                            # image.save(open(results_path+f"image{page_index+1}_{image_index}.{image_ext}", "wb"))
-                            image.save(open(savepath, "wb"))
+                            # save image:
+                            savepath = file_results_path+f"images/figure_{len(figures_list)+1}.{image_ext}"
+                            figures_list.append(savepath)
+                            if args.save:
+                                image = Image.open(io.BytesIO(image_bytes)) # load it to PIL
+                                # image.save(open(results_path+f"image{page_index+1}_{image_index}.{image_ext}", "wb"))
+                                image.save(open(savepath, "wb"))
 
 
             # save extracted text:
@@ -113,6 +114,7 @@ def extract_from_pdf(args):
 
 if __name__ == "__main__":
     args = get_args() # all input arguments
+    print(args)
     print(title)
     # print("NOTE: table extraction with camelot is not working well! Disabled by default!")
     extract_from_pdf(args)
