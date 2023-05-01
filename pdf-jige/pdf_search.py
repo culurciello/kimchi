@@ -1,4 +1,4 @@
-# E. Culurciello, November 2022
+# E. Culurciello, May 2023
 # search data extracted from PDF files (pdf_extractor.py)
 
 import os
@@ -44,7 +44,7 @@ def search_pdf(args):
 
     # sentence embed model
     print('Loading SentenceTransformer...')
-    model = SentenceTransformer('stsb-roberta-large')
+    model = SentenceTransformer('all-MiniLM-L6-v2')
     print('Done!')
 
     # embed input search string

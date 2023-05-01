@@ -1,4 +1,4 @@
-# E. Culurciello, November 2022
+# E. Culurciello, May 2023
 # embed text data extracted from PDF files (pdf_extractor.py)
 
 import os
@@ -39,7 +39,7 @@ def create_dataset_embeddings(args):
 
     # sentence embed model
     print('Loading SentenceTransformer...')
-    model = SentenceTransformer('stsb-roberta-large')
+    embedder = SentenceTransformer('all-MiniLM-L6-v2')
     print('Done!')
 
     # for every directory
@@ -56,7 +56,7 @@ def create_dataset_embeddings(args):
                 print(bcolors.OKCYAN + "Number of sentences: "+str(len(sentences)) + bcolors.ENDC)
 
                 print('Embedding all sentences...')
-                embeddings = model.encode(sentences, convert_to_tensor=True) # 1024 vector per sentence
+                embeddings = embedder.encode(sentences, convert_to_tensor=True) # 1024 vector per sentence
                 # print('done!')
                 embedding_file_path = args.pdf_data_path+directory+"/embeddings.pth"
                 torch.save(embeddings, embedding_file_path)
