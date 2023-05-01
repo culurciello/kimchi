@@ -83,13 +83,15 @@ def search_pdf(args):
                 similarity_sorted = np.sort(similarity_list)[::-1]
                 sorted_idx = np.argsort(similarity_list)[::-1]
                 # print(similarity_sorted, sorted_idx)
-                # print('Top match in document:')
-                # print('Score:', similarity_sorted[0])
-                # print('Sentence:', sentences[sorted_idx[0]])
+                if args.print:
+                    print('Top match in document:')
+                    print('Score:', similarity_sorted[0])
+                    print('Sentence:', sentences[sorted_idx[0]])
         
         return sentences[sorted_idx[0]], similarity_sorted[0]
 
 if __name__ == "__main__":
     args = get_args() # all input arguments
     print(title)
+    args.print=True # print here!
     matches, scores = search_pdf(args)
