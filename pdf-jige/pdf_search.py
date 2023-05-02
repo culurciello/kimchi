@@ -75,20 +75,17 @@ def search_pdf(args):
                 print(bcolors.OKCYAN + "Number of sentences: "+str(len(sentences)) + bcolors.ENDC)
 
                 # for all sentences:
-                similarity_list = []
-                for i, s in enumerate(sentences):
-                    sim = util.pytorch_cos_sim(embeddings[i], embed_input).item()
-                    similarity_list.append(sim)
-
-                similarity_sorted = np.sort(similarity_list)[::-1]
-                sorted_idx = np.argsort(similarity_list)[::-1]
-                # print(similarity_sorted, sorted_idx)
+                top_k=5
+                cos_scores = util.cos_sim(embed_input, embeddings)[0]
+                top_results = torch.topk(cos_scores, k=top_k)
                 if args.print:
-                    print('Top match in document:')
-                    print('Score:', similarity_sorted[0])
-                    print('Sentence:', sentences[sorted_idx[0]])
+                    print("\nTop", top_k, "most similar sentences in corpus:")
+                    for score, idx in zip(top_results[0], top_results[1]):
+                        print("(Score: {:.4f})".format(score), sentences[idx])
+
+                # print(sentences[top_results[1][0]], top_results[0][0])
         
-        return sentences[sorted_idx[0]], similarity_sorted[0]
+        return sentences[top_results[1][0]], top_results[0][0]
 
 if __name__ == "__main__":
     args = get_args() # all input arguments
