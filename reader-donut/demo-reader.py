@@ -51,4 +51,4 @@ if __name__ == "__main__":
     # load document image
     image = Image.open(args.i)
     json = doc2json(image)
-    print(json)
+    print("Output JSON:", json)
